@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0" metadata-complete="true">
+
+
+  <display-name>Archetype Created Web Application</display-name>
+
+  <!--加载Spring的配置文件，把Spring和Mybatis的容器也加载进来-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring-persist-*.xml</param-value>
+  </context-param>
+
+  <!--配置监听器，在ServletContext（单例的）随着服务器启动的时候创建而加载Spring的配置文件-->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!--配置字符集的过滤器-->
+  <filter>
+    <filter-name>characterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceRequestEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceResponseEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <!--这个Filter执行的顺序在其他所有filter之前
+  request.setCharacterEncoding(encoding)必须在request.getParameter()之前。其他filter里会调用request.getParameter()
+  response.setCharacterEncoding(encoding)必须在response.getWriter()之前
+  -->
+  <filter-mapping>
+    <filter-name>characterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+
+  <!--配置DispatcherServlet-->
+  <servlet>
+    <servlet-name>dispatcherServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <!--加载SpringMVC的配置文件-->
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring-web-mvc.xml</param-value>
+    </init-param>
+    <!--Servlet默认是在第一次接收到请求时才会创建对象，但是DispatcherServlet做了大量的框架初始化工作，需要随着web应用启动-->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+    <servlet-mapping>
+      <servlet-name>dispatcherServlet</servlet-name>
+      <url-pattern>*.html</url-pattern>
+      <url-pattern>*.json</url-pattern>
+      <!--url-pattern配置方式一： / 表示拦截所有请求-->
+      <!--<url-pattern>/</url-pattern>-->
+
+      <!--url-pattern配置方式二： 配置请求扩展名
+      静态资源css js img等静态资源就不经过SpringMVC，不需要特殊的处理
+      伪静态的效果。表面上看起来是访问一个HTML文件这样的静态资源，但是实际上是经过Java代码运算的页面
+          优点：
+          - 增加入侵难度。html不知道后台是什么做的
+          - 有利于SEO优化。更容易被搜索到
+          缺点：
+          - 不符合RESTful风格。不能出现扩展名
+          - 如果Ajax请求也是用 .html 返回的是Json。就会出现406
+      -->
+
+
+    </servlet-mapping>
+
+</web-app>

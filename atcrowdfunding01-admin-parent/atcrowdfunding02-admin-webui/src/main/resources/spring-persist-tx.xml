@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--引用mybatis的spring配置文件，解决dataSource引用报错-->
+    <import resource="spring-persist-mybatis.xml"/>
+    <!--把service包扫描到容器-->
+    <context:component-scan base-package="cc.landfill.crowd.service"/>
+
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+       <!--装配数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--配置事务切面-->
+    <aop:config>
+        <!--考虑到后面整合SpringSecurity,避免把其中的UserDetailsService加入事务控制，切入点表达式定位到ServiceImpl而不是Service-->
+        <aop:pointcut id="txPointcut" expression="execution(* *..*ServiceImpl.*(..))"/>
+        <!--将切入点和通知关联-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+
+    <!--配置事务通知 transaction-manager默认值为transactionManager，如果前面的事务管理器的id是这个就不需要配了-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!--配置事务属性-->
+        <tx:attributes>
+            <!--查询方法，配置只读属性，可以让数据库知道是查询操作 进行一定的优化-->
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="query*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+            <!--一般service层为了区分dao层，方法名一般都是get/find/query/save/remove 和sql中的select/insert/delete做一个区分-->
+            <!--增删改方法 配置事务的行为、回滚异常-->
+            <tx:method name="save*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <tx:method name="batch*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception"/>
+            <!--
+            propagation属性
+            REQUIRED: 默认值。当前方法必须工作在事务中，如果当前线程上没有已经开启的事务。则自己开启新的事务
+            如果已经有事务，就运行在该事务中，但是会受事务中其他的方法的的影响，一旦其他事务回滚，改方法也会被回滚
+            REQUIRES_NEW: 推荐配置。不管当前线程上是否有事务，都要自己开启事务，在自己的事务中运行。开启事务就是让一个方法运行在try catch finally里。
+            方法中的逻辑都在try里，出现异常时就回滚。
+            -->
+            <!--
+            rollback-for属性：配置事务方法针对什么样的异常因素回滚
+            默认：运行时异常才回滚
+            建议：编译时异常和运行时异常都回滚
+            -->
+        </tx:attributes>
+    </tx:advice>
+</beans>
