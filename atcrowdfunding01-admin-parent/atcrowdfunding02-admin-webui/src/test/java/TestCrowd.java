@@ -65,4 +65,12 @@ public class TestCrowd {
 
         adminService.saveAdmin(admin);
     }
+
+    @Test
+    public void testBatchInsert() throws SQLException {
+        for (int i = 0;i < 126;i++) {
+            Admin admin = new Admin(null, "loginAcct"+i, "123", "loginAcctName"+i, "login@qq.com"+i, null);
+            adminMapper.insert(admin);
+        }
+    }
 }

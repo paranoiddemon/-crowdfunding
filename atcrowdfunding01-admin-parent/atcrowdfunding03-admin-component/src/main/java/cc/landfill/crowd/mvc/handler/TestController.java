@@ -36,7 +36,7 @@ public class TestController {
         //模拟一个空指针异常
         //String a = null;
         //System.out.println(a.length());
-        //System.out.println(10/0);
+        System.out.println(10/0);
         return "target";
     }
     //Ajax请求向服务器端发送数组

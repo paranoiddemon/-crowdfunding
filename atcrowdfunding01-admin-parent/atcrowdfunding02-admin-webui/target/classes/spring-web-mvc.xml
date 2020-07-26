@@ -32,6 +32,26 @@
     </bean>
 
     <!--配置view-controller-->
+    <!--登录页面-->
     <mvc:view-controller path="/admin/to/login/page.html" view-name="admin-login"/>
+    <!--后台页面-->
+    <mvc:view-controller path="/admin/to/main/page.html" view-name="admin-main"/>
+    <!--跳转到新增页面-->
+    <mvc:view-controller path="/admin/to/add/page.html" view-name="admin-add"/>
+
+    <!--注册拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--登录才能访问的页面-->
+            <mvc:mapping path="/**"/>
+            <!--配置不拦截页面。没有登录也能访问的路径-->
+            <mvc:exclude-mapping path="/admin/to/login/page.html"/>
+            <mvc:exclude-mapping path="/admin/do/logout.html"/>
+            <mvc:exclude-mapping path="/admin/do/login.html"/>
+            <!--配置自定义的拦截器-->
+            <bean class="cc.landfill.crowd.mvc.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
 
 </beans>

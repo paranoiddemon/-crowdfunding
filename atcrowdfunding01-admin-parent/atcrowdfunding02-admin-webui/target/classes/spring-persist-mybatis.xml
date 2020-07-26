@@ -24,12 +24,30 @@
         <property name="mapperLocations" value="classpath:mybatis/mapper/*Mapper.xml"/>
         <!--注入DataSource-->
         <property name="dataSource" ref="dataSource"/>
+        <!--配置PageHelper插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageHelper">
+                    <property name="properties">
+                        <props>
+                            <!--使用的数据库-->
+                            <prop key="dialect">mysql</prop>
+                            <!--页码的合理化修正-->
+                            <prop key="reasonable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+            </array>
+
+        </property>
     </bean>
 
     <!--配置MapperScannerConfigurer 来扫描Mapper接口所在的包-->
     <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="cc.landfill.crowd.mapper"/>  <!--接口在的包-->
     </bean>
+
+
 
 
 

@@ -1,5 +1,9 @@
 package cc.landfill.crowd.mvc.config;
 
+import cc.landfill.crowd.exception.AccessForbiddenException;
+import cc.landfill.crowd.exception.LoginAcctAlreadyInUserException;
+import cc.landfill.crowd.exception.LoginAcctAlreadyInUserForUpateException;
+import cc.landfill.crowd.exception.LoginFailedException;
 import cc.landfill.crowd.util.CrowdUtil;
 import cc.landfill.crowd.util.ResultEntity;
 import com.google.gson.Gson;
@@ -74,4 +78,31 @@ public class CrowdExceptionResolver {
         String viewName = "system-error";
         return generalExceptionResolver(viewName,exception,request,response);
     }
+
+    //处理登录失败异常
+    @ExceptionHandler(LoginFailedException.class)
+    public ModelAndView loginFailedExceptionResolver(Exception exception,HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "system-error";
+        return generalExceptionResolver(viewName,exception,request,response);
+    }
+    //处理登录失败异常
+    @ExceptionHandler(AccessForbiddenException.class)
+    public ModelAndView accessForbiddenExceptionResolver(Exception exception,HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "system-error";
+        return generalExceptionResolver(viewName,exception,request,response);
+    }
+      //新增账户已经存在
+    @ExceptionHandler(LoginAcctAlreadyInUserException.class)
+    public ModelAndView loginAcctAlreadyInUserExceptionResolver(LoginAcctAlreadyInUserException exception,HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "admin-add"; //该页面使用el表达式取出  exception.message
+        return generalExceptionResolver(viewName,exception,request,response);
+    }
+    //更新账户已经存在
+    @ExceptionHandler(LoginAcctAlreadyInUserForUpateException.class)
+    public ModelAndView loginAcctAlreadyInUserForUpdateExceptionResolver(LoginAcctAlreadyInUserException exception,HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String viewName = "system-error";
+        return generalExceptionResolver(viewName,exception,request,response);
+    }
+
+
 }
